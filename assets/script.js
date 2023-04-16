@@ -70,3 +70,22 @@ $("#currentInfo").append(
 );
 // ShowForecastWeather function is only called after showCurrentWeather because it needs coordinates fetched from queryURLcurrent
 showForecastWeather();
+
+// add text and append future days, icon that represents the weather, temperature,
+function appendForecastInfo(id, index) {
+  var icon = data.daily[index].weather[0].icon;
+  var iconURL = "http://openweathermap.org/img/wn/" + icon + "@2x.png";
+  $("#day-" + id).append(
+    "<h3>" + dayjs.unix(data.daily[index].dt).format("MM/DD/YY") + "</h3>"
+  );
+  $("#day-" + id).append("<img src='" + iconURL + "'></img>");
+  $("#day-" + id).append(
+    "<p>" + "Temp: " + data.daily[index].temp.day + "°F" + "</p>"
+  );
+  $("#day-" + id).append(
+    "<p>" + "Wind: " + data.daily[index].wind_speed + " MPH" + "</p>"
+  );
+  $("#day-" + id).append(
+    "<p>" + "Humidity: " + data.daily[index].humidity + " %" + "</p>"
+  );
+}
