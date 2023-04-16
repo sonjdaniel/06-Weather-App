@@ -55,3 +55,18 @@ function showSearchedCities() {
     $("#citiesList").prepend("<li>" + searchedCities[i] + "</li>");
   }
 }
+
+//  adding text and appending city's name with current day, icon that represents the weather, temperature,
+$("#currentInfo").append(
+  "<h2>" + data.name + " " + dayjs.unix(data.dt).format("MM/DD/YY") + "</h2>"
+);
+$("#currentInfo").append("<img src='" + iconURL + "'></img>");
+$("#currentInfo").append(
+  "<p>" + "Temperature: " + data.main.temp + "°F" + "</p>"
+);
+$("#currentInfo").append("<p>" + "Wind: " + data.wind.speed + " MPH" + "</p>");
+$("#currentInfo").append(
+  "<p>" + "Humidity: " + data.main.humidity + " %" + "</p>"
+);
+// ShowForecastWeather function is only called after showCurrentWeather because it needs coordinates fetched from queryURLcurrent
+showForecastWeather();
