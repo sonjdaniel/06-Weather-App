@@ -10,3 +10,19 @@ var queryURLcurrent =
   APIKey;
 fetch(queryURLcurrent);
 console.log(queryURLcurrent);
+
+// Variable to hold name of city on search box
+var city = $("#citySearch").val();
+// If the city is not blank, function showCurrentWeather is called using the city name as a parameter
+if (city) {
+  showCurrentWeather(city);
+}
+
+// Shows searched cities on initial page if there are any
+function showSearchedCities() {
+  var searchedCities = JSON.parse(localStorage.getItem("searchedCities")) || [];
+  // Adds citie's names on page (new ones go on top)
+  for (let i = 0; i < searchedCities.length; i++) {
+    $("#citiesList").prepend("<li>" + searchedCities[i] + "</li>");
+  }
+}
