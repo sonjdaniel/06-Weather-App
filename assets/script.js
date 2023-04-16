@@ -11,12 +11,41 @@ var queryURLcurrent =
 fetch(queryURLcurrent);
 console.log(queryURLcurrent);
 
-// Variable to hold name of city on search box
-var city = $("#citySearch").val();
-// If the city is not blank, function showCurrentWeather is called using the city name as a parameter
-if (city) {
-  showCurrentWeather(city);
-}
+$(function () {
+  showSearchedCities();
+  // search button is clicked function is called
+  $("#search").click(function (e) {
+    e.preventDefault();
+    showMainPage();
+    removeAppend();
+    // Variable to hold name of city on search box
+    var city = $("#citySearch").val();
+    // If the city is not blank,
+    if (city) {
+      showCurrentWeather(city);
+    }
+    // If the city name is blank,
+    else {
+      showSearchedCities();
+      $("#mainPage").hide();
+      // jquery-confirm alert
+      $.alert({
+        title: "City cannot be blank",
+        content: "Please try again",
+      });
+    }
+  });
+  // Function is called when any of the created lis for the searched cities is clicked
+  $(document).on("click", "li", function (e) {
+    e.preventDefault;
+    showMainPage();
+    removeAppend();
+    // Variable to hold name of city in the li that is clicked
+    var city = $(this).text();
+    // Function showCurrentWeather is called using the city name on li as a parameter
+    showCurrentWeather(city);
+  });
+});
 
 // Shows searched cities on initial page if there are any
 function showSearchedCities() {
