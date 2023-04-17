@@ -6,9 +6,9 @@
 
 Weather Dashboard project helps you stay uptodate with the weather. The JavaScript file was created using Day.js, jQuery, and bootstrap libraries
 
-You can access the page at [this location](n/a).
+You can access the page at [this location](https://sonjdaniel.github.io/06-Weather-App/).
 
-<img src="n/a" alt="Weather Dashboard screenshot" width="500px">
+<img src="./asset/06-weather.png" alt="Weather Dashboard screenshot" width="500px">
 
 ## Installation
 
