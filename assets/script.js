@@ -1,174 +1,266 @@
 // Open Weather Map's API key
 var APIKey = "4be13387fd02fce39ad986e3b6696f11";
+// I set the default city to Saint Paul when the page is loaded,
+var city = "Saint Paul";
+// this variable will hold the converted temp from the weather api data
+var fahrenheit;
+// fonts from font awesome
+var iconWeather;
+var iconAdd;
+var fahForecast;
+var searchFormEl = document.querySelector("#search-input");
+var cityInputEl = document.querySelector("#city-input");
+var searchCity;
+var newCity;
+var citiesArr = [];
+var citiesListEl = document.querySelector(".cities");
+var buttonCity;
 
-$(function () {
-  showSearchedCities();
-  // Function is called when search button is clicked
-  $("#search").click(function (e) {
-    e.preventDefault();
-    showMainPage();
-    removeAppend();
-    // Variable to hold name of city on search box
-    var city = $("#citySearch").val();
-    // When blank it shows the current weather
-    if (city) {
-      showCurrentWeather(city);
-    }
-    // When blank search it gets an error
-    else {
-      showSearchedCities();
-      $("#mainPage").hide();
-      // jquery-confirm alert
-      $.alert({
-        title: "City cannot be blank",
-        content: "Please try again",
-      });
-    }
-  });
-  // Function is called  created a list for the searched cities
-  $(document).on("click", "li", function (e) {
-    e.preventDefault;
-    showMainPage();
-    removeAppend();
-    var city = $(this).text();
-    showCurrentWeather(city);
-  });
-});
+var today = dayjs();
+// I used jquery here, since that is what we used with dayjs in class
+$("#today-date").text("(" + today.format("MMM D, YYYY") + ")");
 
-// Function to show the current weather
-function showCurrentWeather(city) {
-  // hold the API link - link changes according to city name
-  var queryURLcurrent =
-    "http://api.openweathermap.org/data/2.5/weather?q=" +
+// I had to do this way to break it down for me to understand how things are working.
+
+var d0 = new Date(today);
+d0.setDate(d0.getDate() + 1);
+var dateFormat0 = new Date(d0);
+var day0 = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+}).format(dateFormat0);
+
+var d1 = new Date(today);
+d1.setDate(d1.getDate() + 2);
+var dateFormat1 = new Date(d1);
+var day1 = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+}).format(dateFormat1);
+
+var d2 = new Date(today);
+d2.setDate(d2.getDate() + 3);
+var dateFormat2 = new Date(d2);
+var day2 = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+}).format(dateFormat2);
+
+var d3 = new Date(today);
+d3.setDate(d3.getDate() + 4);
+var dateFormat3 = new Date(d3);
+var day3 = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+}).format(dateFormat3);
+
+var d4 = new Date(today);
+d4.setDate(d4.getDate() + 5);
+var dateFormat4 = new Date(d4);
+var day4 = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+}).format(dateFormat4);
+
+var nextDayArr = [day0, day1, day2, day3, day4];
+
+for (i = 0; i < nextDayArr.length; i++) {
+  document.getElementById("day" + [i] + "D").innerHTML = nextDayArr[i];
+}
+
+setWeather();
+
+function setWeather() {
+  // This first url fetches the current weather and puts it in the header
+  var defaultQueryURL =
+    "https://api.openweathermap.org/data/2.5/weather?q=" +
     city +
-    "&units=imperial" +
     "&appid=" +
     APIKey;
-  fetch(queryURLcurrent);
-  console
-    .log(queryURLcurrent)
-    // Fetch URL's response
-    .then(function (response) {
-      // error log
-      if (response.status !== 200) {
-        $("#mainPage").hide();
-        showSearchedCities();
-        $.alert({
-          title: "City not recognized",
-          content: "Please try again",
-        });
-      }
-      // If status code is 200 (OK), returns response in JSON format
-      return response.json();
-    })
-    // Using JSON response to fetch data
-    .then(function (data) {
-      // Variable to get all searched cities if any from local storage
-      var searchedCities =
-        JSON.parse(localStorage.getItem("searchedCities")) || [];
-      // Only adds name of searched city to variable if the name is not yet saved - this avoids duplicates
-      if (!searchedCities.includes(data.name)) {
-        searchedCities.push(data.name);
-      }
-      // Variable to hold coordinates of searched cities
-      var coord = {
-        lat: data.coord.lat,
-        lon: data.coord.lon,
-      };
-      // Saving searcher cities and coordinates in local storage
-      localStorage.setItem("searchedCities", JSON.stringify(searchedCities));
-      showSearchedCities();
-      localStorage.setItem("coordinates", JSON.stringify(coord));
-      // Variable to hold the code for the weather icon
-      var icon = data.weather[0].icon;
-      // Variable to hold link to access png of weather icon
-      var iconURL = "http://openweathermap.org/img/wn/" + icon + "@2x.png";
-      // adding text and appending city's name with current day, icon that represents the weather, temperature,
-      $("#currentInfo").append(
-        "<h2>" +
-          data.name +
-          " " +
-          dayjs.unix(data.dt).format("MM/DD/YY") +
-          "</h2>"
-      );
-      $("#currentInfo").append("<img src='" + iconURL + "'></img>");
-      $("#currentInfo").append(
-        "<p>" + "Temperature: " + data.main.temp + "°F" + "</p>"
-      );
-      $("#currentInfo").append(
-        "<p>" + "Wind: " + data.wind.speed + " MPH" + "</p>"
-      );
-      $("#currentInfo").append(
-        "<p>" + "Humidity: " + data.main.humidity + " %" + "</p>"
-      );
-      showForecastWeather();
-    });
-}
 
-// Function to show forecast weather
-function showForecastWeather() {
-  // Variable to get coordinates of searched city from local storage
-  var coord = JSON.parse(localStorage.getItem("coordinates"));
-  // Variable to hold the API link
-  var oneCallURL =
-    "https://api.openweathermap.org/data/3.0/onecall?lat=" +
-    coord.lat +
-    "&lon=" +
-    coord.lon +
-    "&exclude=current,minutely,hourly,alerts&units=imperial" +
+  fetch(defaultQueryURL).then(function (response) {
+    if (response.ok) {
+      response.json().then(function (data) {
+        // console log
+        console.log(data);
+
+        fahrenheit = Math.round(
+          (parseFloat(data.main.temp) - 273.15) * 1.8 + 32
+        );
+        document.getElementById("city-select").innerHTML = data.name;
+        document.getElementById("temp-select").innerHTML =
+          "Temp: " + fahrenheit + "\u00B0" + " F";
+        document.getElementById("wind-select").innerHTML =
+          "Wind: " + data.wind.speed + " mph";
+        document.getElementById("humid-select").innerHTML =
+          "Humidity: " + data.main.humidity + "%";
+
+        addIcon();
+
+        //use font awesome
+        function addIcon() {
+          iconWeather = data.weather[0].main;
+
+          iconAdd = document.getElementById("curr-icon");
+
+          if (iconWeather == "Clouds") {
+            console.log("The weather is Clouds.");
+            iconAdd.classList = "fa-solid fa-cloud";
+          } else if (iconWeather == "Clear") {
+            console.log("The weather is Clear.");
+            iconAdd.classList = "fa-solid fa-sun";
+          } else if (iconWeather == "Snow") {
+            console.log("The weather is Snow.");
+            iconAdd.classList = "fa-solid fa-snowflake";
+          } else if (iconWeather == "Rain" || iconWeather == "Drizzle") {
+            console.log("The weather is Rain or Drizzle.");
+            iconAdd.classList = "fa-solid fa-cloud-showers-heavy";
+          } else if (iconWeather == "Thunderstorm") {
+            console.log("The weather is Thunderstorm.");
+            iconAdd.classList = "fa-solid fa-cloud-bolt";
+          } else if (iconWeather == "Tornado") {
+            console.log("The weather is Tornado.");
+            iconAdd.classList = "fa-solid fa-tornado";
+          } else {
+            console.log("the weather is some sort of fog or smoke or haze");
+            iconAdd.classList = "fa-solid fa-smog";
+          }
+        }
+      });
+    } else {
+      alert("Error: " + response.statusText);
+    }
+  });
+
+  // this is a different url from Open Weather that is just a five day forecast
+  // I was able to figure out loops to get all the weather info in the day blocks
+  var defaultForecastURL =
+    "https://api.openweathermap.org/data/2.5/forecast?q=" +
+    city +
     "&appid=" +
     APIKey;
-  // Fetch URL's response
-  fetch(oneCallURL)
-    // Returns response in JSON format to extract data
-    .then(function (response) {
-      return response.json();
-    })
-    .then(function (data) {
-      // Loop to do appendForecastInfo for data objects from index 1 to 5 (representing five future days)
-      for (let i = 1; i <= 5; i++) {
-        appendForecastInfo(i, i);
-      }
-      // add text and append future days, icon that represents the weather, temperature,
-      function appendForecastInfo(id, index) {
-        var icon = data.daily[index].weather[0].icon;
-        var iconURL = "http://openweathermap.org/img/wn/" + icon + "@2x.png";
-        $("#day-" + id).append(
-          "<h3>" + dayjs.unix(data.daily[index].dt).format("MM/DD/YY") + "</h3>"
-        );
-        $("#day-" + id).append("<img src='" + iconURL + "'></img>");
-        $("#day-" + id).append(
-          "<p>" + "Temp: " + data.daily[index].temp.day + "°F" + "</p>"
-        );
-        $("#day-" + id).append(
-          "<p>" + "Wind: " + data.daily[index].wind_speed + " MPH" + "</p>"
-        );
-        $("#day-" + id).append(
-          "<p>" + "Humidity: " + data.daily[index].humidity + " %" + "</p>"
-        );
-      }
-    });
+
+  fetch(defaultForecastURL).then(function (response) {
+    if (response.ok) {
+      response.json().then(function (data) {
+        // The forecast data included eight hours for each day. I chose the eighth hour, since it had the highest temp of the day
+        var dayOne = data.list[7];
+        var dayTwo = data.list[15];
+        var dayThree = data.list[23];
+        var dayFour = data.list[31];
+        var dayFive = data.list[39];
+        var dayArray = [dayOne, dayTwo, dayThree, dayFour, dayFive];
+
+        for (i = 0; i < dayArray.length; i++) {
+          fahForecast = Math.round(
+            (parseFloat(dayArray[i].main.temp) - 273.15) * 1.8 + 32
+          );
+          document.getElementById("day" + [i] + "T").innerHTML =
+            "Temp: " + fahForecast + "\u00B0" + " F";
+        }
+
+        for (i = 0; i < dayArray.length; i++) {
+          document.getElementById("day" + [i] + "W").innerHTML =
+            "Wind: " + dayArray[i].wind.speed + " mph";
+        }
+
+        for (i = 0; i < dayArray.length; i++) {
+          document.getElementById("day" + [i] + "H").innerHTML =
+            "Humidity: " + dayArray[i].main.humidity + "%";
+        }
+
+        for (i = 0; i < dayArray.length; i++) {
+          if (dayArray[i].weather[0].main == "Clouds") {
+            console.log("The weather is Clouds.");
+            document.getElementById("day" + [i] + "I").classList =
+              "fa-solid fa-cloud";
+          } else if (dayArray[i].weather[0].main == "Clear") {
+            console.log("The weather is Clear.");
+            document.getElementById("day" + [i] + "I").classList =
+              "fa-solid fa-sun";
+          } else if (dayArray[i].weather[0].main == "Snow") {
+            console.log("The weather is Snow.");
+            document.getElementById("day" + [i] + "I").classList =
+              "fa-solid fa-snowflake";
+          } else if (
+            dayArray[i].weather[0].main == "Rain" ||
+            dayArray[i].weather[0].main == "Drizzle"
+          ) {
+            console.log("The weather is Rain or Drizzle.");
+            document.getElementById("day" + [i] + "I").classList =
+              "fa-solid fa-cloud-showers-heavy";
+          } else if (dayArray[i].weather[0].main == "Thunderstorm") {
+            console.log("The weather is Thunderstorm.");
+            document.getElementById("day" + [i] + "I").classList =
+              "fa-solid fa-cloud-bolt";
+          } else if (dayArray[i].weather[0].main == "Tornado") {
+            console.log("The weather is Tornado.");
+            document.getElementById("day" + [i] + "I").classList =
+              "fa-solid fa-tornado";
+          } else {
+            console.log("the weather is some sort of fog or smoke or haze");
+            document.getElementById("day" + [i] + "I").classList =
+              "fa-solid fa-smog";
+          }
+        }
+      });
+    } else {
+      alert("Error: " + response.statusText);
+    }
+  });
 }
 
-// Shows searched cities on initial page if there are any
-function showSearchedCities() {
-  var searchedCities = JSON.parse(localStorage.getItem("searchedCities")) || [];
-  // Adds citie's names on page (new ones go on top)
-  for (let i = 0; i < searchedCities.length; i++) {
-    $("#citiesList").prepend("<li>" + searchedCities[i] + "</li>");
+//  event listener for the search button
+searchFormEl.addEventListener("submit", formSubmitCity);
+
+function formSubmitCity(event) {
+  event.preventDefault();
+
+  searchCity = cityInputEl.value.trim();
+  console.log(searchCity);
+
+  // this saves the search input into local storage
+  if (searchCity) {
+    cityInputEl.value = "";
+    localStorage.setItem("savedCity", searchCity);
+    newCity = localStorage.getItem("savedCity");
+
+    citiesArr.push(newCity);
+
+    localStorage.setItem("allCities", JSON.stringify(citiesArr));
+    var newCityArr = JSON.parse(localStorage.getItem("allCities"));
+
+    var cityButton = document.createElement("button");
+    var cityBtnText = document.createTextNode(newCity);
+    cityButton.setAttribute("class", "new-city-button");
+
+    for (i = 0; i < newCityArr.length; i++) {
+      cityButton.setAttribute("id", newCityArr[i]);
+    }
+
+    cityButton.appendChild(cityBtnText);
+    citiesListEl.appendChild(cityButton);
+
+    var newCityButtonEl = $(".new-city-button");
+    newCityButtonEl.on("click", renderButtonWeather);
+
+    // the cities in the search history needed to be buttons that could render their weather again when clicked;
+    function renderButtonWeather() {
+      buttonCity = $(this).attr("id");
+      console.log(buttonCity);
+      console.log(typeof buttonCity);
+
+      city = buttonCity;
+      setWeather();
+    }
   }
-}
 
-// emove JS created elements
-function removeAppend() {
-  $("#currentInfo").empty();
-  for (let id = 1; id <= 5; id++) {
-    $("#day-" + id).empty();
-  }
-  $("#citiesList").empty();
-}
-
-// Shows main page with searched city
-function showMainPage() {
-  $("#mainPage").show();
+  // this takes the initial search input and sets the weather for that city
+  city = searchCity;
+  setWeather();
 }
